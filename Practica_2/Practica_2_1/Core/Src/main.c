@@ -42,11 +42,16 @@
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
+// Declaración de variables
+delay_t ledDelay;
+
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
@@ -96,31 +101,23 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  /*Punto 2:
-Utilizar el pulsador (B1) para controlar el tiempo de encendido.  Cada vez que se presiona el
-pulsador el tiempo de encendido debe alternar entre 200 ms y 500 ms.
-   "NOTA: se mantiene el Duty cicle al 50%
+  delayInit(&ledDelay, 100); // Inicializa el delay a 100ms
+
+  /*Punto 1
+Punto 2
+Sobre el código desarrollado para el punto 1 y sobre el mismo proyecto, implementar
+un programa que utilice retardos no bloqueantes y  haga parpadear el leds de la placa
+de desarrollo: 100 ms encendido, 100 ms apagado, en forma periódica.
+
+NOTA: El desarrollo del código del "Punto 1" me permite cambiar el delayInit(&ledDelay, 500)
+a delayInit(&ledDelay, 100); y cumplir con la consigna.
    */
-  // Declaración de variables
-  uint32_t tiempo_anterior = 0;
-  //int DC = 0.5; // Duty cicle 50%
-  int T1 = 500;
-  int T2 = 200;
-  int delay = T2;
 
   while (1)
   {
-	  if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET){
-		  if (delay == T2 )
-	      	delay = T1;
-	    	else delay = T2;
-	  }
-	  // Encender el LED LD2 (Pin PA5)
-	  if (HAL_GetTick() - tiempo_anterior >= delay) //controla el tiempo de encendido
-	  {
+
+	  if (delayRead(&ledDelay)) //delayRead devolverá 'true' solo cada 100ms
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // cambia el estado del PIN
-		  tiempo_anterior = HAL_GetTick(); // Reiniciar el cronómetro
-	  }
 
 	 /* USER CODE END WHILE */
 
@@ -266,6 +263,54 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
+
+/**
+ * @brief Inicializa la estructura de delay.
+ */
+void delayInit( delay_t * delay, tick_t duration ) {
+   if( delay != NULL ) {
+      delay->duration = duration;
+      delay->running = false;
+      delay->startTime = 0;
+   }
+}
+
+/**
+ * @brief Lee el estado del delay.
+ * @return true si el tiempo se cumplió, false en caso contrario.
+ */
+bool_t delayRead( delay_t * delay ) {
+   bool_t timeReached = false;
+
+   if( delay != NULL ) {
+      // Si no está corriendo, iniciamos el conteo
+      if( !delay->running ) {
+         delay->startTime = HAL_GetTick();
+         delay->running = true;
+      } else {
+         // Si está corriendo, verificamos si ya pasó el tiempo
+         // La resta (Actual - Inicial) maneja correctamente el overflow del tick
+         if( (HAL_GetTick() - delay->startTime) >= delay->duration ) {
+            timeReached = true;
+            delay->running = false; // Reset para el próximo ciclo
+         }
+      }
+   }
+   return timeReached;
+}
+
+/**
+ * @brief Permite cambiar la duración de un delay existente.
+ */
+void delayWrite( delay_t * delay, tick_t duration ) {
+   if( delay != NULL ) {
+      delay->duration = duration;
+   }
+}
+
+
+
+
 #ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
