@@ -1,5 +1,5 @@
 ** Contiene el desarrollo de los Tareas Prácticas asignadas en clase **
-# Alumno: Daniel Bazán 
+#  Alumno: Daniel Bazán 
 
 
 ## Práctica 1
