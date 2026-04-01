@@ -9,3 +9,6 @@ https://docs.google.com/document/d/1fl6L11Qs_wYL1mUJ3uoBSyiHV8bwPvFCp9vqzRC9Les/
 
 ## Práctica 3
 https://docs.google.com/document/d/1fAw-eAtX52VjcR8bvN298Jz44n6Nb6kU3PdxG9vCUZg/edit?usp=sharing
+
+## Práctica 4
+https://docs.google.com/document/d/1CX4KTVn3uY7enfEcNfTl3tCuVk0B7EkHnTgDlH0-pgM/edit?usp=sharing
